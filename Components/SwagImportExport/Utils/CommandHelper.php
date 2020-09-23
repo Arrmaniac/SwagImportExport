@@ -100,6 +100,11 @@ class CommandHelper
     protected $customerStream;
 
     /**
+     * @var int
+     */
+    protected $orderStatus;
+
+    /**
      * @var Connection
      */
     protected $connection;
@@ -166,6 +171,10 @@ class CommandHelper
 
         if (!empty($data['customerStream'])) {
             $this->customerStream = $data['customerStream'];
+        }
+
+        if (!empty($data['filter']) && isset($data['filter']['orderstate'])) {
+            $this->orderStatus = $data['filter']['orderstate'];
         }
     }
 
@@ -235,6 +244,10 @@ class CommandHelper
 
         if ($this->dateTo) {
             $postData['filter']['dateTo'] = $this->dateTo;
+        }
+
+        if (!is_null($this->orderStatus)) {
+            $postData['filter']['orderstate'] = $this->orderStatus;
         }
 
         /** @var Profile $profile */
@@ -309,6 +322,10 @@ class CommandHelper
 
         if ($this->dateTo) {
             $postData['filter']['dateTo'] = $this->dateTo;
+        }
+
+        if (!is_null($this->orderStatus)) {
+            $postData['filter']['orderstate'] = $this->orderStatus;
         }
 
         /** @var Profile $profile */

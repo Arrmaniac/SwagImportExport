@@ -67,6 +67,11 @@ class ExportCommand extends ShopwareCommand
     protected $dateTo;
 
     /**
+     * @var int
+     */
+    protected $orderStatus;
+
+    /**
      * @var string
      */
     protected $category;
@@ -104,6 +109,7 @@ class ExportCommand extends ShopwareCommand
             ->addOption('dateTo', 'to', InputOption::VALUE_OPTIONAL, 'Date to')
             ->addOption('category', 'c', InputOption::VALUE_OPTIONAL, 'Provide a category ID')
             ->addOption('productStream', null, InputOption::VALUE_OPTIONAL, 'Provide a Product-Stream ID')
+            ->addOption('orderStatus', 'oS', InputOption::VALUE_OPTIONAL, 'Provide a order-state ID')
             ->setHelp('The <info>%command.name%</info> exports data to a file.');
     }
 
@@ -114,6 +120,7 @@ class ExportCommand extends ShopwareCommand
     {
         // Validation of user input
         $this->prepareExportInputValidation($input);
+        $orderStateFilter = $this->getOrderStateFilter();
 
         $this->registerErrorHandler($output);
 
@@ -128,7 +135,7 @@ class ExportCommand extends ShopwareCommand
                 'offset' => $this->offset,
                 'dateFrom' => $this->dateFrom,
                 'dateTo' => $this->dateTo,
-                'filter' => [],
+                'filter' => [] + $orderStateFilter,
                 'username' => 'Commandline',
                 'category' => $this->category ? [$this->category] : null,
                 'productStream' => $this->productStream ? [$this->productStream] : null,
@@ -168,6 +175,17 @@ class ExportCommand extends ShopwareCommand
         }
     }
 
+    protected function getOrderStateFilter():array
+    {
+        $orderStatusFilter = [];
+
+        if(!is_null($this->orderStatus)) {
+            $orderStatusFilter['orderstate'] = $this->orderStatus;
+        }
+
+        return $orderStatusFilter;
+    }
+
     /**
      * @throws \RuntimeException
      */
@@ -184,6 +202,7 @@ class ExportCommand extends ShopwareCommand
         $this->productStream = $input->getOption('productStream');
         $this->dateFrom = $input->getOption('dateFrom');
         $this->dateTo = $input->getOption('dateTo');
+        $this->orderStatus = $input->getOption('orderStatus');
 
         if (!empty($this->dateFrom)) {
             try {
