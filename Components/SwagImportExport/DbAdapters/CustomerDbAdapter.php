@@ -327,6 +327,9 @@ class CustomerDbAdapter implements DataDbAdapter
                     $record = $this->dataManager->setDefaultFieldsForCreate($record, $defaultValues);
                     $this->validator->checkRequiredFieldsForCreate($record);
                     $customer = new Customer();
+                } else {
+                    //skip this record, because we already know this user
+                    continue;
                 }
 
                 $this->preparePassword($record);
