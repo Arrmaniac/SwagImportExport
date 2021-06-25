@@ -124,7 +124,7 @@ class CommandHelper
         if (!isset($data['format'])) {
             throw new \RuntimeException('No format given!');
         }
-        if (!isset($data['filePath']) || !is_dir(dirname($data['filePath']))) {
+        if (!isset($data['filePath']) || !\is_dir(\dirname($data['filePath']))) {
             throw new \RuntimeException('Invalid file path ' . $data['filePath']);
         }
 
@@ -162,8 +162,8 @@ class CommandHelper
         }
 
         if (!empty($data['productStream'])) {
-            if (is_array($data['productStream'])) {
-                $data['productStream'] = array_shift($data['productStream']);
+            if (\is_array($data['productStream'])) {
+                $data['productStream'] = \array_shift($data['productStream']);
             }
 
             $this->productStream = $this->getProductStreamIdByName($data['productStream']);
@@ -187,10 +187,10 @@ class CommandHelper
      */
     public static function findProfileByName($filename, Repository $repository)
     {
-        $parts = explode('.', $filename);
+        $parts = \explode('.', $filename);
 
         foreach ($parts as $part) {
-            $part = strtolower($part);
+            $part = \strtolower($part);
             /** @var ProfileEntity $profileEntity */
             $profileEntity = $repository->findOneBy(['name' => $part]);
 
@@ -277,7 +277,7 @@ class CommandHelper
 
         return [
             'position' => $position,
-            'count' => count($ids),
+            'count' => \count($ids),
         ];
     }
 
@@ -293,7 +293,7 @@ class CommandHelper
             'type' => 'export',
             'format' => $this->format,
             'sessionId' => $this->sessionId,
-            'fileName' => basename($this->filePath),
+            'fileName' => \basename($this->filePath),
             'filter' => [],
             'limit' => [
                 'limit' => $this->limit,
@@ -365,7 +365,7 @@ class CommandHelper
 
         $resultData = $dataWorkflow->export($postData, $this->filePath);
 
-        $message = sprintf(
+        $message = \sprintf(
             '%s %s %s',
             $resultData['position'],
             SnippetsHelper::getNamespace('backend/swag_import_export/default_profiles')->get('type/' . $profile->getType()),
@@ -375,7 +375,7 @@ class CommandHelper
         $this->logger->write($message, 'false', $dataSession->getEntity());
 
         $logData = new LogDataStruct(
-            date('Y-m-d H:i:s'),
+            \date('Y-m-d H:i:s'),
             $resultData['fileName'],
             $profile->getName(),
             $message,
@@ -418,7 +418,7 @@ class CommandHelper
         $fileReader = $this->plugin->getFileIOFactory()->createFileReader($postData['format']);
 
         if ($this->format === 'xml') {
-            $tree = json_decode($this->profileEntity->getTree(), true);
+            $tree = \json_decode($this->profileEntity->getTree(), true);
             $fileReader->setTree($tree);
         }
 
@@ -540,7 +540,7 @@ class CommandHelper
                 && ($dataSessionTotalCount == $resultData['position'])
                 && $this->logger->getMessage() === null
             ) {
-                $message = sprintf(
+                $message = \sprintf(
                     '%s %s %s',
                     $resultData['position'],
                     SnippetsHelper::getNamespace('backend/swag_import_export/default_profiles')->get($resultData['adapter']),
@@ -550,7 +550,7 @@ class CommandHelper
                 $this->logger->write($message, 'false', $dataSession->getEntity());
 
                 $logDataStruct = new LogDataStruct(
-                    date('Y-m-d H:i:s'),
+                    \date('Y-m-d H:i:s'),
                     $inputFile,
                     $profile->getName(),
                     $message,
@@ -565,7 +565,7 @@ class CommandHelper
             $this->logger->write($e->getMessage(), 'true', $dataSession->getEntity());
 
             $logDataStruct = new LogDataStruct(
-                date('Y-m-d H:i:s'),
+                \date('Y-m-d H:i:s'),
                 $inputFile,
                 $profile->getName(),
                 $e->getMessage(),
@@ -628,15 +628,15 @@ class CommandHelper
             ->execute()
             ->fetchAll(\PDO::FETCH_COLUMN);
 
-        $idAmount = count($id);
+        $idAmount = \count($id);
         if ($idAmount > 1) {
-            throw new \RuntimeException(sprintf('There are %d streams with the name: %s. Please use the stream id.', $idAmount, $productStreamName));
+            throw new \RuntimeException(\sprintf('There are %d streams with the name: %s. Please use the stream id.', $idAmount, $productStreamName));
         }
 
         if ($idAmount < 1) {
-            throw new \RuntimeException(sprintf('There are no streams with the name: %s', $productStreamName));
+            throw new \RuntimeException(\sprintf('There are no streams with the name: %s', $productStreamName));
         }
 
-        return array_shift($id);
+        return \array_shift($id);
     }
 }
